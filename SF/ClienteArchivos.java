@@ -1,49 +1,63 @@
-import java.io.BufferedOutputStream;
-import java.io.FileOutputStream;
+import java.io.BufferedOutputStream; // Permite almacenar en búfer la salida y admitir los métodos de marcar y restablecer
+import java.io.FileOutputStream; // Retorna los bytes recibidos en un archivo especifico
 import java.io.IOException;
-import java.io.InputStream;
+import java.io.InputStream; // Define el flujo de entrada de bytes
 import java.net.Socket;
 
 public class ClienteArchivos {
 
-  public final static int SOCKET_PORT = 5005;      
-  public final static String SERVER = "192.168.128.34";  
-  public final static String FILE_TO_RECEIVED = "/Users/telematica/AAA.txt";  
+  public static final int PUERTO_SOCKET = 5005; // Definir puerto para el socket
+  public static final String SERVIDOR = "192.168.20.88"; // Dirección IP del servidor, en este caso se usa el localhost
+  public static final String ARCHIVO = "./recibido.txt"; // Ruta y nombre del archivo que recibe la información
+  // Si se ejecuta en el mismo equipo deben tener diferentes nombres, porque si no se reemplazará
 
-  public final static int FILE_SIZE = 40022386; 
+  public static final int TAMANYO_ARCHIVO = 40022386; // Tamaño del fichero temporal codificado
+  // Debe ser más grande que el archivo a descargar
 
-  public static void main (String [] args ) throws IOException {
-    int bytesRead;
-    int current = 0;
-    FileOutputStream fos = null;
-    BufferedOutputStream bos = null;
-    Socket sock = null;
-    try {
-      sock = new Socket(SERVER, SOCKET_PORT);
-      System.out.println("Conectando...");
-
-      byte [] mybytearray  = new byte [FILE_SIZE];
-      InputStream is = sock.getInputStream();
-      fos = new FileOutputStream(FILE_TO_RECEIVED);
-      bos = new BufferedOutputStream(fos);
-      bytesRead = is.read(mybytearray,0,mybytearray.length);
-      current = bytesRead;
-
-      do {
-         bytesRead =
-            is.read(mybytearray, current, (mybytearray.length-current));
-         if(bytesRead >= 0) current += bytesRead;
-      } while(bytesRead > -1);
-
-      bos.write(mybytearray, 0 , current);
-      bos.flush();
-      System.out.println("File " + FILE_TO_RECEIVED + " downloaded (" + current + " bytes read)");
-    }
-    finally {
-      if (fos != null) fos.close();
-      if (bos != null) bos.close();
-      if (sock != null) sock.close();
-    }
+  public static void main(String[] args) throws IOException {
+    // Arranca el programa
+    ClienteArchivos app = new ClienteArchivos();
+    app.start();
   }
 
+  public void start() throws IOException {
+    // Inicializa las variables
+    int lecturaBytes;
+    int byteActual = 0;
+    FileOutputStream retornarBytes = null;
+    BufferedOutputStream buferAlmacenado = null;
+    Socket sock = null;
+
+    // Para detectar errores se emplea un controlador de excepciones 
+    // Ejecución del programa
+    try {
+      sock = new Socket(SERVIDOR, PUERTO_SOCKET); // Crea el socket con la dirección IP y el puerto
+      System.out.println("Conectando...");
+      byte[] mybytearray = new byte[TAMANYO_ARCHIVO]; // Crea un vector de bytes con el tamaño estipulado 
+      InputStream entradaBytes = sock.getInputStream(); // Prepara los bytes recibidos
+      retornarBytes = new FileOutputStream(ARCHIVO); // Retorna los bytes recibidos al fichero especificado
+      buferAlmacenado = new BufferedOutputStream(retornarBytes); // Almacena los bytes de bufer en el fichero
+      lecturaBytes = entradaBytes.read(mybytearray, 0, mybytearray.length); // Lee los bytes de entrada
+      byteActual = lecturaBytes;
+
+      // Descarga de bytes en el fichero establecido
+      do {
+        lecturaBytes = entradaBytes.read(mybytearray, byteActual, (mybytearray.length - byteActual));
+        if (lecturaBytes >= 0) byteActual += lecturaBytes;
+      } while (lecturaBytes > -1);
+
+      buferAlmacenado.write(mybytearray, 0, byteActual); // Escribe los bytes recibidos 
+
+      buferAlmacenado.flush(); // Vacía el flujo de entrada y fuerza la escritura de los bytes
+
+      System.out.println("File " + ARCHIVO + " downloaded (" + byteActual + " bytes read)");
+    } catch (Exception e) {
+      e.printStackTrace();
+    } finally {
+      // Al finalizar hace:
+      if (retornarBytes != null) retornarBytes.close(); // Cierra retorno de bytes
+      if (buferAlmacenado != null) buferAlmacenado.close(); // Cierra almacenamiento
+      if (sock != null) sock.close(); // Cierra la conexión
+    }
+  }
 }
