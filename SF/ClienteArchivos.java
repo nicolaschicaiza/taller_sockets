@@ -6,8 +6,8 @@ import java.net.Socket;
 
 public class ClienteArchivos {
 
-  public static final int PUERTO_SOCKET = 5005; // Definir puerto para el socket
-  public static final String SERVIDOR = "192.168.20.88"; // Dirección IP del servidor, en este caso se usa el localhost
+  public static final int PUERTO_SOCKET = 3738; // Definir puerto para el socket
+  public static final String SERVIDOR = "127.0.0.1"; // Dirección IP del servidor, en este caso se usa el localhost
   public static final String ARCHIVO = "./recibido.txt"; // Ruta y nombre del archivo que recibe la información
   // Si se ejecuta en el mismo equipo deben tener diferentes nombres, porque si no se reemplazará
 

@@ -9,7 +9,7 @@ import java.util.ArrayList;
 
 public class ServidorArchivos {
 
-  public static final int PUERTO_SOCKET = 5005; // Puerto definido para la servicio 
+  public static final int PUERTO_SOCKET = 3738; // Puerto definido para la servicio 
   public static final String ARCHIVO = "./enviado.txt"; // Ruta donde se encuentra el fichero a tx
   private ArrayList<Socket> cliente;
 
